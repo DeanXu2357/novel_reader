@@ -19,8 +19,8 @@ type BookMark struct {
     // Book books.Book `gorm:"foreignkey:Book_id"`
     User_id uint
     Book_id uint
-    Chap uint
-    Line uint
+    Chap uint `gorm:"default:0"`
+    Line uint `gorm:"default:0"`
 }
 
 func init() {
