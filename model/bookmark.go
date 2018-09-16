@@ -1,109 +1,90 @@
-package bookmark
+package model
 
 import (
-    "fmt"
-    "strings"
+	"fmt"
 
-    "github.com/jinzhu/gorm"
-    _ "github.com/jinzhu/gorm/dialects/postgres"
-    "github.com/spf13/viper"
+	Db "reader_api/database"
 
-    // "reader_api/model/book"
+	"github.com/jinzhu/gorm"
+	// "reader_api/model/book"
 )
 
-var db *gorm.DB
+// Bookmark 書籤基本類
+type Bookmark struct {
+	gorm.Model
+	// Book books.Book `gorm:"foreignkey:Book_id"`
+	UserID uint
+	BookID uint
+	Chap   uint `gorm:"default:0"`
+	Line   uint `gorm:"default:0"`
+}
+
+func init() {
+	Db.Orm.AutoMigrate(&Bookmark{})
+	// db.Model(&BookMark).Related(&book.Book)
+}
+
+var bookmarks []Bookmark
 var err error
 
-type Bookmark struct {
-    gorm.Model
-    // Book books.Book `gorm:"foreignkey:Book_id"`
-    User_id uint
-    Book_id uint
-    Chap uint `gorm:"default:0"`
-    Line uint `gorm:"default:0"`
-}
+// 新增
+// 修改
+// 刪除
 
-// config 初始
-func init() {
-    viper.SetConfigType("yaml")
-    viper.SetConfigName("config")
-    viper.AddConfigPath(".")
-    viper.SetEnvPrefix("dev")
-    viper.AutomaticEnv()
-    viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+// List 顯示全部
+func (bookmark *Bookmark) List(userID string) (bookmarks []Bookmark, err error) {
+	if err = Db.Orm.Where("user_id = ?", userID).Find(&bookmarks).Error; err != nil {
+		fmt.Println("[Model Error]")
+		// fmt.Printf("%+v\n", errs)
+		fmt.Println(err)
+		return
+	}
 
-    if err:= viper.ReadInConfig(); err != nil {
-        fmt.Println(err)
-    }
-}
-
-// DB 初始
-func init() {
-    db_info := "host=" + viper.GetString("DB_HOST")
-    db_info += " port=" + viper.GetString("DB_PORT")
-    db_info += " user=" + viper.GetString("DB_USER")
-    db_info += " dbname=" + viper.GetString("DB_NAME")
-    db_info += " password=" + viper.GetString("DB_PASS")
-
-    db, err = gorm.Open("postgres", db_info)
-
-    if err != nil {
-        fmt.Println("DATABASE ERROR !!")
-        fmt.Println(err)
-        fmt.Println("Connecting Data")
-        fmt.Println(db_info)
-    }
-    defer db.Close()
-
-    fmt.Println("[Debug]")
-    fmt.Printf("%+v\n", db)
-    db.AutoMigrate(&Bookmark{})
-    // db.Model(&BookMark).Related(&book.Book)
+	return
 }
 
 // 新增書籤
 func Add(bookmark Bookmark) {
-    fmt.Println("debug !!!!")
-    fmt.Printf("%+v\n", bookmark)
+	//     fmt.Println("debug !!!!")
+	//     fmt.Printf("%+v\n", bookmark)
 
-    fmt.Println("[Debug]")
-    fmt.Printf("%+v\n", db)
+	//     fmt.Println("[Debug]")
+	//     fmt.Printf("%+v\n", db)
 
-    if db.NewRecord(bookmark) == false {
-        panic("not new record")
-    }
+	//     if db.NewRecord(bookmark) == false {
+	//         panic("not new record")
+	//     }
 
-    if err := db.Create(&bookmark).Error; err != nil {
-        fmt.Printf("%+v\n", err)
-        panic(err)
-    }
+	//     if err := db.Create(&bookmark).Error; err != nil {
+	//         fmt.Printf("%+v\n", err)
+	//         panic(err)
+	//     }
 }
 
 // 取得該User的所有書籤
-func ListByUser(user_id string) *gorm.DB { //  ([]Bookmark, []error) {
-    // var bookmarks []Bookmark
+// func ListByUser(user_id string) *gorm.DB { //  ([]Bookmark, []error) {
+// var bookmarks []Bookmark
 
-    // err := db.Where("user_id = ?", user_id).Find(&bookmarks).GetErrors
+// err := db.Where("user_id = ?", user_id).Find(&bookmarks).GetErrors
 
-    // return bookmarks, err
+// return bookmarks, err
 
-    db.DB().Ping()
+//     db.DB().Ping()
 
-    return db.Where("user_id = ?", user_id)
-}
+//     return db.Where("user_id = ?", user_id)
+// }
 
 // 取得指定的書籤（用User&Book查找
 func FindByUserAndBook() {
-    // code...
+	// code...
 }
 
 // 刪除指定書籤
 func Delete() {
-    // code...
+	// code...
 }
 
 // 編輯指定書籤的 chap & line
 func Edit() {
-    // code...
+	// code...
 }
-
