@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
-
 	"reader_api/model"
+
+    "github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -75,20 +75,14 @@ func AddBookMark(c *gin.Context) {
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
-	//   add_item := model.Bookmark{User_id: uint(user_id64), Book_id: uint(book_id64)}
-	// add_item.User_id = uint(user_id64)
-	// add_item.Book_id = uint(book_id64)
-	// if item := bookmark.Add(add_item);item.Error != nil {
-	//     fmt.Println("[Error] bookmark.Add")
-	//     fmt.Println(item.Error)
-	//     c.AbortWithError(200, item.Error)
-	// } else {
-	//     c.JSON(200, item)
-	// }
+    var bookmark = model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+    if err := bookmark.Create(); err != nil {
+        fmt.Println("[Error]")
+        fmt.Println(err)
+        c.AbortWithError(404, err)
+    }
 
-	// bookmark.Add(add_item)
-
-	c.JSON(200, userID64+bookID64)
+	c.JSON(200, bookmark)
 }
 
 // DeleteBookMark 刪除書籤

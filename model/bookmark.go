@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+    "errors"
 
 	Db "reader_api/database"
 
@@ -24,18 +25,18 @@ func init() {
 	// db.Model(&BookMark).Related(&book.Book)
 }
 
-var bookmarks []Bookmark
-var err error
+// var bookmarks []Bookmark
+// var err error
 
 // 新增
 // 修改
 // 刪除
 
 // List 顯示全部
-func (bookmark *Bookmark) List(userID string) (bookmarks []Bookmark, err error) {
+func (bookmark Bookmark) List(userID string) (bookmarks []Bookmark, err error) {
 	if err = Db.Orm.Where("user_id = ?", userID).Find(&bookmarks).Error; err != nil {
 		fmt.Println("[Model Error]")
-		// fmt.Printf("%+v\n", errs)
+		// fmt.Printf("%+v\n", err)
 		fmt.Println(err)
 		return
 	}
@@ -43,22 +44,21 @@ func (bookmark *Bookmark) List(userID string) (bookmarks []Bookmark, err error) 
 	return
 }
 
-// 新增書籤
-func Add(bookmark Bookmark) {
-	//     fmt.Println("debug !!!!")
-	//     fmt.Printf("%+v\n", bookmark)
+// Create 新增書籤
+func (bookmark *Bookmark) Create() (err error) {
 
-	//     fmt.Println("[Debug]")
-	//     fmt.Printf("%+v\n", db)
+    if Db.Orm.NewRecord(bookmark) == false {
+        err = errors.New("Not a New Record !!")
+        fmt.Println(err)
+        return
+    }
 
-	//     if db.NewRecord(bookmark) == false {
-	//         panic("not new record")
-	//     }
+	if err = Db.Orm.Create(&bookmark).Error; err != nil {
+	    fmt.Printf("%+v\n", err)
+        return
+	}
 
-	//     if err := db.Create(&bookmark).Error; err != nil {
-	//         fmt.Printf("%+v\n", err)
-	//         panic(err)
-	//     }
+    return
 }
 
 // 取得該User的所有書籤
