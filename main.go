@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"reader_api/model"
+    Log "reader_api/logs"
 
     "github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -34,7 +35,7 @@ func main() {
 		{
 			// test route
 			// v1.GET("/test", Test)
-
+            v1.Use(LogMiddleware())
 			v1.GET("/:user_id/books/", ListBooks)
 			v1.PUT("/:user_id/books/:book_id", AddBookMark)
 			v1.DELETE("/:user_id/books/:book_id", DeleteBookMark)
@@ -43,6 +44,12 @@ func main() {
 	}
 
 	r.Run(":8080")
+}
+
+func LogMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        Log.Info.Println(c.Request.URL)
+    }
 }
 
 // Test 測試路由
