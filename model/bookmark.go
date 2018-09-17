@@ -1,8 +1,8 @@
 package model
 
 import (
+	"errors"
 	"fmt"
-    "errors"
 
 	Db "reader_api/database"
 
@@ -13,10 +13,10 @@ import (
 type Bookmark struct {
 	gorm.Model
 	// Book books.Book `gorm:"foreignkey:Book_id"`
-    UserID uint `gorm:"unique_index:user_book_uk"`
-    BookID uint `gorm:"unique_index:user_book_uk"`
-    Chap   uint `gorm:"default:0"`
-    Line   uint `gorm:"default:0"`
+	UserID uint `gorm:"unique_index:user_book_uk"`
+	BookID uint `gorm:"unique_index:user_book_uk"`
+	Chap   uint `gorm:"default:0"`
+	Line   uint `gorm:"default:0"`
 }
 
 func init() {
@@ -41,21 +41,16 @@ func (bookmark Bookmark) List(userID string) (bookmarks []Bookmark, err error) {
 // Create 新增書籤
 func (bookmark *Bookmark) Create() (err error) {
 
-    if Db.Orm.NewRecord(bookmark) == false {
-        err = errors.New("Not a New Record !!")
-        fmt.Println(err)
-        return
-    }
-
-	if err = Db.Orm.Create(&bookmark).Error; err != nil {
-	    fmt.Printf("%+v\n", err)
-        return
+	if Db.Orm.NewRecord(bookmark) == false {
+		err = errors.New("Not a New Record")
+		fmt.Println(err)
+		return
 	}
 
-    return
+	if err = Db.Orm.Create(&bookmark).Error; err != nil {
+		fmt.Printf("%+v\n", err)
+		return
+	}
+
+	return
 }
-
-// func (bookmark *Bookmark) Find(userID string, bookID string) (err error) {
-
-// }
-

@@ -46,9 +46,11 @@ func main() {
 	r.Run(":8080")
 }
 
+// LogMiddleware 紀錄資料中介層
 func LogMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         Log.Info.Println(c.Request.URL)
+        c.Next()
     }
 }
 
@@ -88,7 +90,7 @@ func AddBookMark(c *gin.Context) {
     if err := bookmark.Create(); err != nil {
         fmt.Println("[Error]")
         fmt.Println(err)
-        c.AbortWithError(404, "Sorry, There's something wrong . We'll fix it as soon as possible")
+        c.AbortWithError(404, err)
         return
     }
 
