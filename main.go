@@ -82,11 +82,14 @@ func AddBookMark(c *gin.Context) {
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
+    // todo 添加檢查 user_book_uk 是否重複
+
     var bookmark = model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
     if err := bookmark.Create(); err != nil {
         fmt.Println("[Error]")
         fmt.Println(err)
-        c.AbortWithError(404, err)
+        c.AbortWithError(404, "Sorry, There's something wrong . We'll fix it as soon as possible")
+        return
     }
 
 	c.JSON(200, bookmark)
