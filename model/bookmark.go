@@ -54,3 +54,35 @@ func (bookmark *Bookmark) Create() (err error) {
 
 	return
 }
+
+// Get 撈取指定的資料
+func (bookmark *Bookmark) Get() (err error) {
+	if err = Db.Orm.Where(&bookmark).First(&bookmark).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+	return
+}
+
+// Update 指定目標更新內容
+// func (bookmark *Bookmark) Update(userID string, bookID string) (updateResult Bookmark, err error) {
+
+// tar := Db.Orm.Where("user_id = ?", userID).Where("book_id = ?", bookID).First()
+// if err = Db.Orm.First(updateResult, "user_id = ?", userID, "book_id = ?", bookID).Error; err != nil {
+// fmt.Println(err)
+// return
+// }
+
+// if Db.Orm.NewRecord(tar) {
+// }
+
+// if err =
+// }
+
+// func (bookmark *Bookmark) Delete() (err error) {
+
+// }
+
+// func (bookmark *Bookmark) Where() (bookmark Bookmark, err error) {
+
+// }
