@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	Log "reader_api/logs"
 	"reader_api/model"
-    Log "reader_api/logs"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -35,7 +35,7 @@ func main() {
 		{
 			// test route
 			// v1.GET("/test", Test)
-            v1.Use(LogMiddleware())
+			v1.Use(LogMiddleware())
 			v1.GET("/:user_id/books/", ListBooks)
 			v1.PUT("/:user_id/books/:book_id", AddBookMark)
 			v1.DELETE("/:user_id/books/:book_id", DeleteBookMark)
@@ -48,10 +48,10 @@ func main() {
 
 // LogMiddleware 紀錄資料中介層
 func LogMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        Log.Info.Println(c.Request.URL)
-        c.Next()
-    }
+	return func(c *gin.Context) {
+		Log.Info.Println(c.Request.URL)
+		c.Next()
+	}
 }
 
 // Test 測試路由
@@ -70,6 +70,7 @@ func ListBooks(c *gin.Context) {
 	if err != nil {
 		fmt.Println("[Error]")
 		fmt.Println(err)
+		Log.Error.Println(err)
 		c.AbortWithError(404, err)
 		return
 	}
@@ -84,17 +85,32 @@ func AddBookMark(c *gin.Context) {
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
-    // todo 添加檢查 user_book_uk 是否重複
+	// todo 添加檢查 user_book_uk 是否重複
 
-    var bookmark = model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
-    if err := bookmark.Create(); err != nil {
-        fmt.Println("[Error]")
-        fmt.Println(err)
-        c.AbortWithError(404, err)
-        return
-    }
+	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+	err := bookmark.Get()
 
-	c.JSON(200, bookmark)
+	switch err {
+	case nil:
+		c.JSON(200, bookmark)
+		return
+	case model.ErrRecordNotFound:
+		if errC := bookmark.Create(); errC != nil {
+			fmt.Println("[Error]")
+			fmt.Println(errC)
+			Log.Error.Print(errC)
+			c.AbortWithError(404, errC)
+			return
+		}
+		c.JSON(200, bookmark)
+		return
+	default:
+		fmt.Println("[Error]")
+		fmt.Println(err)
+		Log.Error.Println(err)
+		c.AbortWithError(404, err)
+		return
+	}
 }
 
 // DeleteBookMark 刪除書籤
