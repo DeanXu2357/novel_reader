@@ -73,7 +73,7 @@ func (bookmark *Bookmark) UpdateDetail(chap uint, line uint) (err error) {
     // }
 
     if Db.Orm.NewRecord(bookmark) {
-        err = fmt.Errorf("Cannot update new record object")
+        err = ErrRecordNotFound
         return
     }
 
@@ -81,21 +81,22 @@ func (bookmark *Bookmark) UpdateDetail(chap uint, line uint) (err error) {
         return
     }
     return
-	// tar := Db.Orm.Where("user_id = ?", userID).Where("book_id = ?", bookID).First()
-	// if err = Db.Orm.First(updateResult, "user_id = ?", userID, "book_id = ?", bookID).Error; err != nil {
-	// fmt.Println(err)
-	// return
-	// }
-
-	// if Db.Orm.NewRecord(tar) {
-	// }
-
-	// if err =
 }
 
-// func (bookmark *Bookmark) Delete() (err error) {
+// Delete 刪除指定目標
+func (bookmark *Bookmark) Delete() (err error) {
 
-// }
+    if Db.Orm.NewRecord(bookmark) {
+        err = ErrRecordNotFound
+        return
+    }
+
+    if err = Db.Orm.Delete(&bookmark).Error; err != nil {
+        return
+    }
+
+    return
+}
 
 // func (bookmark *Bookmark) Where() (bookmark Bookmark, err error) {
 

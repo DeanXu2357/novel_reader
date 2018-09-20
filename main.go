@@ -126,8 +126,33 @@ func AddBookMark(c *gin.Context) {
 func DeleteBookMark(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
+	userID64, _ := strconv.ParseUint(userID, 10, 64)
+	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
-	c.JSON(200, "user_id = "+userID+", book_id = "+bookID)
+    bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+	err := bookmark.Get()
+	switch err {
+	case nil:
+        // TODO DELETE
+        if errD := bookmark.Delete(); errD != nil {
+            fmt.Println("[Error]")
+            fmt.Println(errD)
+            Log.Error.Println(errD)
+			c.AbortWithError(404, errD)
+            return
+        }
+		c.JSON(200, bookmark)
+		return
+	case model.ErrRecordNotFound:
+		c.JSON(200, "No Data to delete")
+		return
+	default:
+		fmt.Println("[Error]")
+		fmt.Println(err)
+		Log.Error.Println(err)
+		c.AbortWithError(404, err)
+		return
+	}
 }
 
 // ReadBook 從書籤處閱讀
