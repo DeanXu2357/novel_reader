@@ -82,16 +82,25 @@ func ListBooks(c *gin.Context) {
 func AddBookMark(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
+    chap := c.PostForm("chap")
+    line := c.PostForm("line")
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
+    chap64, _ := strconv.ParseUint(chap, 10, 64)
+    line64, _ := strconv.ParseUint(line, 10, 64)
 
-	// todo 添加檢查 user_book_uk 是否重複
-
-	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+    bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64), Chap: uint(chap64), Line: uint(line64)}
 	err := bookmark.Get()
 
 	switch err {
 	case nil:
+        if errU := bookmark.UpdateDetail(uint(chap64), uint(line64)); errU != nil {
+            fmt.Println("[Error]")
+            fmt.Println(errU)
+            Log.Error.Println(errU)
+			c.AbortWithError(404, errU)
+            return
+        }
 		c.JSON(200, bookmark)
 		return
 	case model.ErrRecordNotFound:
@@ -125,6 +134,14 @@ func DeleteBookMark(c *gin.Context) {
 func ReadBook(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
+    chap := c.PostForm("chap")
+    line := c.DefaultPostForm("line", "113")
 
-	c.JSON(200, "user_id = "+userID+", book_id = "+bookID)
+    if line == "" {
+        c.JSON(200, "line is null")
+        return
+    }
+
+	c.JSON(200, "user_id = "+userID+", book_id = "+bookID+", chap = "+chap+", line = "+line)
 }
+
