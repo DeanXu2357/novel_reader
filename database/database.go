@@ -33,6 +33,7 @@ func init() {
 	db_info += " user=" + viper.GetString("DB_USER")
 	db_info += " dbname=" + viper.GetString("DB_NAME")
 	db_info += " password=" + viper.GetString("DB_PASS")
+	db_info += " sslmode=disable"
 
 	Orm, err = gorm.Open("postgres", db_info)
 

@@ -28,5 +28,5 @@ services:
     environment:
       TZ: 'GMT+8'
       PGTZ: 'GMT+8'
-      POSTGRES_PASSWORD:
+      POSTGRES_PASSWORD: 'fortestpwd'
       POSTGRES_DB: novel_reader

@@ -14,9 +14,12 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
 RUN "date"
 
 RUN mkdir /app
-ADD . /app/
+# ADD . /app/
 WORKDIR /app
-RUN go run -o main .
-CMD ["/app/main"]
+# RUN go build -o main .
+
+# CMD ["/app/main"]
+
+CMD ["go","run","main.go"]
 
 EXPOSE 8080
