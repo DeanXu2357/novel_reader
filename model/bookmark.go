@@ -83,7 +83,7 @@ func (bookmark *Bookmark) UpdateDetail(chap uint, line uint) (err error) {
     return
 }
 
-// Delete 刪除指定目標
+//  刪除指定目標
 func (bookmark *Bookmark) Delete() (err error) {
 
     if Db.Orm.NewRecord(bookmark) {
