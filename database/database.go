@@ -5,10 +5,12 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
+	// postgres db driver import
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 )
 
+// Orm gorm基本Db
 var Orm *gorm.DB
 var err error
 
@@ -28,20 +30,19 @@ func init() {
 
 // DB 初始
 func init() {
-	db_info := "host=" + viper.GetString("DB_HOST")
-	db_info += " port=" + viper.GetString("DB_PORT")
-	db_info += " user=" + viper.GetString("DB_USER")
-	db_info += " dbname=" + viper.GetString("DB_NAME")
-	db_info += " password=" + viper.GetString("DB_PASS")
-	db_info += " sslmode=disable"
+	dbInfo := "host=" + viper.GetString("DB_HOST")
+	dbInfo += " port=" + viper.GetString("DB_PORT")
+	dbInfo += " user=" + viper.GetString("DB_USER")
+	dbInfo += " dbname=" + viper.GetString("DB_NAME")
+	dbInfo += " password=" + viper.GetString("DB_PASS")
+	dbInfo += " sslmode=disable"
 
-	Orm, err = gorm.Open("postgres", db_info)
+	Orm, err = gorm.Open("postgres", dbInfo)
 
 	if err != nil {
 		fmt.Println("DATABASE ERROR !!")
 		fmt.Println(err)
 		fmt.Println("Connecting Data")
-		fmt.Println(db_info)
+		fmt.Println(dbInfo)
 	}
-	// defer Orm.Close()
 }
