@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  go:
+    image: golang
+    build:
+      context: .
+      args:
+        TIMEZONE: Asia/Taipei
+    container_name: golang
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    links:
+      - db
+  db:
+    image: postgres:11
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./postgres/data:/var/lib/postgresql/data"
+    environment:
+      TZ: 'GMT+8'
+      PGTZ: 'GMT+8'
+      POSTGRES_PASSWORD: 'fortestpwd'
+      POSTGRES_DB: novel_reader

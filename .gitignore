@@ -1,3 +1,4 @@
 config.yml
 test.go
 golang.log
+/postgres/data
