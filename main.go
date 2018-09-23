@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"strings"
 
@@ -49,7 +51,24 @@ func main() {
 // LogMiddleware 紀錄資料中介層
 func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		Log.Info.Println("=== Request Input ===")
 		Log.Info.Println(c.Request.URL)
+
+		Log.Info.Println("=== Header 		===")
+		for k, v := range c.Request.Header {
+			Log.Info.Println(k, v)
+		}
+
+		buf, _ := ioutil.ReadAll(c.Request.Body)
+		rdr1 := ioutil.NopCloser(bytes.NewBuffer(buf))
+		rdr2 := ioutil.NopCloser(bytes.NewBuffer(buf))
+
+		Log.Info.Println("=== Body          ===")
+		body, _ := ioutil.ReadAll(rdr1)
+		Log.Info.Println(string(body))
+		c.Request.Body = rdr2
+		Log.Info.Println("=====================")
+
 		c.Next()
 	}
 }
@@ -82,25 +101,25 @@ func ListBooks(c *gin.Context) {
 func AddBookMark(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
-    chap := c.PostForm("chap")
-    line := c.PostForm("line")
+	chap := c.PostForm("chap")
+	line := c.PostForm("line")
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
-    chap64, _ := strconv.ParseUint(chap, 10, 64)
-    line64, _ := strconv.ParseUint(line, 10, 64)
+	chap64, _ := strconv.ParseUint(chap, 10, 64)
+	line64, _ := strconv.ParseUint(line, 10, 64)
 
-    bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64), Chap: uint(chap64), Line: uint(line64)}
+	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64), Chap: uint(chap64), Line: uint(line64)}
 	err := bookmark.Get()
 
 	switch err {
 	case nil:
-        if errU := bookmark.UpdateDetail(uint(chap64), uint(line64)); errU != nil {
-            fmt.Println("[Error]")
-            fmt.Println(errU)
-            Log.Error.Println(errU)
+		if errU := bookmark.UpdateDetail(uint(chap64), uint(line64)); errU != nil {
+			fmt.Println("[Error]")
+			fmt.Println(errU)
+			Log.Error.Println(errU)
 			c.AbortWithError(404, errU)
-            return
-        }
+			return
+		}
 		c.JSON(200, bookmark)
 		return
 	case model.ErrRecordNotFound:
@@ -129,18 +148,18 @@ func DeleteBookMark(c *gin.Context) {
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
-    bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
 	err := bookmark.Get()
 	switch err {
 	case nil:
-        // TODO DELETE
-        if errD := bookmark.Delete(); errD != nil {
-            fmt.Println("[Error]")
-            fmt.Println(errD)
-            Log.Error.Println(errD)
+		// TODO DELETE
+		if errD := bookmark.Delete(); errD != nil {
+			fmt.Println("[Error]")
+			fmt.Println(errD)
+			Log.Error.Println(errD)
 			c.AbortWithError(404, errD)
-            return
-        }
+			return
+		}
 		c.JSON(200, bookmark)
 		return
 	case model.ErrRecordNotFound:
@@ -159,14 +178,14 @@ func DeleteBookMark(c *gin.Context) {
 func ReadBook(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
-    chap := c.PostForm("chap")
-    line := c.DefaultPostForm("line", "113")
+	// chap := c.PostForm("chap")
+	// line := c.DefaultPostForm("line", "113")
+	userID64, _ := strconv.ParseUint(userID, 10, 64)
+	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
-    if line == "" {
-        c.JSON(200, "line is null")
-        return
-    }
+	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
+	bookmark.Get()
 
-	c.JSON(200, "user_id = "+userID+", book_id = "+bookID+", chap = "+chap+", line = "+line)
+	c.JSON(200, bookmark)
+	return
 }
-
