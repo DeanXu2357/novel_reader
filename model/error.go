@@ -5,5 +5,6 @@ import (
 )
 
 var (
-    ErrRecordNotFound = gorm.ErrRecordNotFound
+	// ErrRecordNotFound gorm 的空值錯誤
+	ErrRecordNotFound = gorm.ErrRecordNotFound
 )

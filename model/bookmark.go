@@ -67,35 +67,38 @@ func (bookmark *Bookmark) Get() (err error) {
 // UpdateDetail 指定目標更新內容
 func (bookmark *Bookmark) UpdateDetail(chap uint, line uint) (err error) {
 
-    // if bookmark.(type) != Bookmark {
-    //     err = fmt.Errorf("Invalid type")
-    //     return
-    // }
+	// if bookmark.(type) != Bookmark {
+	//     err = fmt.Errorf("Invalid type")
+	//     return
+	// }
+	if bookmark.Chap == chap && bookmark.Line == line {
+		return
+	}
 
-    if Db.Orm.NewRecord(bookmark) {
-        err = ErrRecordNotFound
-        return
-    }
+	if Db.Orm.NewRecord(bookmark) {
+		err = ErrRecordNotFound
+		return
+	}
 
-    if err = Db.Orm.Model(&bookmark).Updates(map[string]interface{}{"chap": chap, "line": line}).Error; err != nil {
-        return
-    }
-    return
+	if err = Db.Orm.Model(&bookmark).Updates(map[string]interface{}{"chap": chap, "line": line}).Error; err != nil {
+		return
+	}
+	return
 }
 
-//  刪除指定目標
+// Delete 刪除指定目標
 func (bookmark *Bookmark) Delete() (err error) {
 
-    if Db.Orm.NewRecord(bookmark) {
-        err = ErrRecordNotFound
-        return
-    }
+	if Db.Orm.NewRecord(bookmark) {
+		err = ErrRecordNotFound
+		return
+	}
 
-    if err = Db.Orm.Delete(&bookmark).Error; err != nil {
-        return
-    }
+	if err = Db.Orm.Delete(&bookmark).Error; err != nil {
+		return
+	}
 
-    return
+	return
 }
 
 // func (bookmark *Bookmark) Where() (bookmark Bookmark, err error) {
