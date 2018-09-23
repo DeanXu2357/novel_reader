@@ -51,10 +51,11 @@ func main() {
 // LogMiddleware 紀錄資料中介層
 func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		Log.Info.Println("=== Request Input ===")
+		Log.Info.Println("=============================")
+		Log.Info.Println("=== Request Input         ===")
 		Log.Info.Println(c.Request.URL)
 
-		Log.Info.Println("=== Header 		===")
+		Log.Info.Println("=== Request Header        ===")
 		for k, v := range c.Request.Header {
 			Log.Info.Println(k, v)
 		}
@@ -63,13 +64,20 @@ func LogMiddleware() gin.HandlerFunc {
 		rdr1 := ioutil.NopCloser(bytes.NewBuffer(buf))
 		rdr2 := ioutil.NopCloser(bytes.NewBuffer(buf))
 
-		Log.Info.Println("=== Body          ===")
+		Log.Info.Println("=== Request Body          ===")
 		body, _ := ioutil.ReadAll(rdr1)
 		Log.Info.Println(string(body))
 		c.Request.Body = rdr2
-		Log.Info.Println("=====================")
+		// Log.Info.Println("=============================")
+
+		rl := &responseLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+		c.Writer = rl
 
 		c.Next()
+
+		Log.Info.Println("=== Response Body         ===")
+		Log.Info.Println(rl.body.String())
+		Log.Info.Println("=============================")
 	}
 }
 
