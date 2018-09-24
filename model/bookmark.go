@@ -20,15 +20,14 @@ type Bookmark struct {
 }
 
 func init() {
+
 	Db.Orm.AutoMigrate(&Bookmark{})
 	// db.Model(&BookMark).Related(&book.Book)
 }
 
-// 修改
-// 刪除
-
 // List 顯示該 userID 書籤列表
 func (bookmark Bookmark) List(userID string) (bookmarks []Bookmark, err error) {
+
 	if err = Db.Orm.Where("user_id = ?", userID).Find(&bookmarks).Error; err != nil {
 		fmt.Println("[Model Error]")
 		fmt.Println(err)
@@ -57,6 +56,7 @@ func (bookmark *Bookmark) Create() (err error) {
 
 // Get 撈取指定的資料
 func (bookmark *Bookmark) Get() (err error) {
+
 	if err = Db.Orm.Where("user_id = ?", bookmark.UserID).Where("book_id = ?", bookmark.BookID).First(&bookmark).Error; err != nil {
 		fmt.Println(err)
 		return
@@ -101,6 +101,17 @@ func (bookmark *Bookmark) Delete() (err error) {
 	return
 }
 
-// func (bookmark *Bookmark) Where() (bookmark Bookmark, err error) {
+// Book 取得書本資訊
+func (bookmark Bookmark) Book() (book Book, err error) {
 
-// }
+	if Db.Orm.NewRecord(bookmark) {
+		err = ErrRecordNotFound
+		return
+	}
+
+	if err = Db.Orm.Model(bookmark).Related(&book).Error; err != nil {
+		return
+	}
+
+	return
+}
