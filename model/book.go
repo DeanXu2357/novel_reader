@@ -9,10 +9,10 @@ import (
 // Book 書籍資訊
 type Book struct {
 	gorm.Model
-	path       string
-	name       string
-	author     string
-	latestChap string
+	Path       string
+	Name       string
+	Author     string
+	LatestChap string
 }
 
 func init() {
