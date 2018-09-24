@@ -160,7 +160,7 @@ func DeleteBookMark(c *gin.Context) {
 	err := bookmark.Get()
 	switch err {
 	case nil:
-		// TODO DELETE
+		// TODO: DELETE
 		if errD := bookmark.Delete(); errD != nil {
 			fmt.Println("[Error]")
 			fmt.Println(errD)
@@ -186,14 +186,36 @@ func DeleteBookMark(c *gin.Context) {
 func ReadBook(c *gin.Context) {
 	userID := c.Params.ByName("user_id")
 	bookID := c.Params.ByName("book_id")
-	// chap := c.PostForm("chap")
-	// line := c.DefaultPostForm("line", "113")
 	userID64, _ := strconv.ParseUint(userID, 10, 64)
 	bookID64, _ := strconv.ParseUint(bookID, 10, 64)
 
 	bookmark := model.Bookmark{UserID: uint(userID64), BookID: uint(bookID64)}
-	bookmark.Get()
 
-	c.JSON(200, bookmark)
-	return
+	err := bookmark.Get()
+	switch err {
+	case nil:
+		book, errB := bookmark.Book()
+		if errB != nil {
+			Log.Error.Println(err)
+			c.AbortWithError(404, err)
+			return
+		}
+
+		chapter := fmt.Sprint(bookmark.Chap)
+		content, errC := ioutil.ReadFile(book.Path + chapter)
+		if errC != nil {
+			c.AbortWithError(500, errC)
+			return
+		}
+
+		c.JSON(200, string(content))
+		return
+	case model.ErrRecordNotFound:
+		c.JSON(200, "No Such Data")
+		return
+	default:
+		Log.Error.Println(err)
+		c.AbortWithError(404, err)
+		return
+	}
 }
